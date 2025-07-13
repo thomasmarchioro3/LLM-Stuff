@@ -6,28 +6,28 @@ from langgraph.graph import StateGraph, START, END
 
 from ._core import ChatState
 
+
 def build_graph(llm: Runnable, tools: list[BaseTool]):
 
     tool_node = ToolNode(tools=tools)
 
-    def llm_node(state: ChatState, config: RunnableConfig | None=None) -> ChatState:
-        response = llm.invoke(state['messages'], config=config)
+    def llm_node(state: ChatState, config: RunnableConfig | None = None) -> ChatState:
+        response = llm.invoke(state["messages"], config=config)
 
         state = ChatState(
-            messages=state['messages'] + [response],
+            messages=state["messages"] + [response],
         )
         return state
-    
-    def tools_node(state: ChatState, config: RunnableConfig | None=None) -> ChatState:
-        
+
+    def tools_node(state: ChatState, config: RunnableConfig | None = None) -> ChatState:
+
         tool_output = tool_node.invoke(state, config=config)
 
         state = ChatState(
-            messages=state['messages'] + tool_output['messages'],
+            messages=state["messages"] + tool_output["messages"],
         )
 
         return state
-
 
     def router(state: ChatState) -> str:
         msg = state["messages"][-1]
@@ -37,8 +37,8 @@ def build_graph(llm: Runnable, tools: list[BaseTool]):
         return "end"
 
     builder = StateGraph(ChatState, RunnableConfig)
-    builder.add_node('llm', llm_node)
-    builder.add_node('tools', tools_node)
+    builder.add_node("llm", llm_node)
+    builder.add_node("tools", tools_node)
 
     """
     Structure:
@@ -46,9 +46,9 @@ def build_graph(llm: Runnable, tools: list[BaseTool]):
     START -> llm -> router (tools?) -- YES --> tools --> JUMP llm (loop)
                                     -- NO ---> END
     """
-    builder.add_edge(START, 'llm')
-    builder.add_edge('tools', 'llm')
-    builder.add_conditional_edges('llm', router, {'tools': 'tools', 'end': END})
+    builder.add_edge(START, "llm")
+    builder.add_edge("tools", "llm")
+    builder.add_conditional_edges("llm", router, {"tools": "tools", "end": END})
 
     graph = builder.compile()
 
