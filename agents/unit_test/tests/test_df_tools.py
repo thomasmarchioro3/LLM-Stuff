@@ -55,8 +55,6 @@ class TestDataFrameTools(unittest.TestCase):
         self.runtime["df"] = pl.DataFrame({"col": [1, 2, 3, 4, 5, 6, 7, 8]})
 
         output_state = self.graph.invoke(input_state)
-
-        output_state = self.graph.invoke(input_state)
         messages = output_state.get("messages", [])
 
         # Should have output messages

@@ -58,7 +58,6 @@ training_args = DPOConfig(
     gradient_accumulation_steps = 4, # Increase to 4 for smoother training
     max_prompt_length = max_prompt_length,
     max_completion_length = max_seq_length - max_prompt_length,
-    # num_train_epochs = 1, # Set to 1 for a full training run
     max_steps = 250,
     save_steps = 250,
     max_grad_norm = 0.1,
@@ -76,5 +75,5 @@ trainer = DPOTrainer(
 )
 
 trainer.train()
-# model.save_pretrained("my_llama3_dpo_lora")
-model.save_pretrained_gguf("my_llama3_dpo_lora", tokenizer, quantization_method = "q4_k_m")
+model.save_pretrained("my_llama3_dpo_lora")
+# model.save_pretrained_gguf("my_llama3_dpo_lora", tokenizer, quantization_method = "q4_k_m")
