@@ -1,0 +1,56 @@
+FROM deepseek-r1:latest
+
+TEMPLATE """
+{{- if .System }}{{ .System }}{{ end }}
+{{- if .Tools }}
+
+## Tools
+
+### Function
+
+You have the following functions available:
+
+{{- range .Tools }}
+- {{ .Function.Name }}
+```json
+{{ .Function }}
+```
+{{- end }}
+
+For function call returns, you should first print <｜tool▁calls▁begin｜>
+
+For each function call, you must return:
+
+<｜tool▁call▁begin｜>function<｜tool▁sep｜><function_name>\n```json\n<function_arguments_in_json_format>\n```<｜tool▁call▁end｜>
+
+Do not forget the function name or arguments. If more than one function call is required, return them in the same response instead of separately.
+
+At the end of function call returns, you should print <｜tool▁calls▁end｜>.
+
+{{ end }}
+{{- range $i, $_ := .Messages }}
+{{- $last := eq (len (slice $.Messages $i)) 1}}
+{{- if eq .Role "user" }}<｜User｜>{{ .Content }}
+{{- else if eq .Role "tool" }}<｜User｜><｜tool▁outputs▁begin｜><｜tool▁output▁begin｜>{{ .Content }}<｜tool▁output▁end｜><｜tool▁outputs▁end｜>
+{{- else if eq .Role "assistant" }}<｜Assistant｜>
+{{- if and $.IsThinkSet (and $last .Thinking) -}}
+<think>
+{{ .Thinking }}
+</think>
+{{- end }}
+{{- if .ToolCalls }}<｜tool▁calls▁begin｜>
+{{- range .ToolCalls }}<｜tool▁call▁begin｜>function<｜tool▁sep｜>{{ .Function.Name }}
+```json
+{{ .Function.Arguments }}
+```<｜tool▁call▁end｜>{{ end }}<｜tool▁calls▁end｜>
+{{- else if .Content }}{{ .Content }}{{- end }}
+{{- if not $last }}<｜end▁of▁sentence｜>{{ end }}
+{{- end }}
+{{- if and $last (ne .Role "assistant") }}<｜Assistant｜>
+{{- if and $.IsThinkSet (not $.Think) -}}
+<think>
+</think>
+{{ end }}
+{{- end }}
+{{- end }}
+"""

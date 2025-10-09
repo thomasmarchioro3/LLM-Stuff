@@ -32,6 +32,8 @@ if __name__ == "__main__":
     # Issue:  https://github.com/ollama/ollama/issues/8517
     #MODEL_NAME = "deepseek-r1:latest"
     
+    MODEL_NAME = "deepseek-gg"
+
     # content='The result of 3239 multiplied by 17 is 55,063.' additional_kwargs={} response_metadata={'model': 'llama3.1:8b', 'created_at': '2025-09-15T18:30:31.016660597Z', 'done': True, 'done_reason': 'stop', 'total_duration': 706448958, 'load_duration': 24817128, 'prompt_eval_count': 98, 'prompt_eval_duration': 56166750, 'eval_count': 17, 'eval_duration': 621458839, 'model_name': 'llama3.1:8b'} id='run--29ae9643-ab16-4ddf-b1f5-c2d8fb16773b-0' usage_metadata={'input_tokens': 98, 'output_tokens': 17, 'total_tokens': 115}
     #MODEL_NAME = "llama3.1:8b"
     
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     #MODEL_NAME = "qwen3:8b"
     
     # content=' The result of multiplying 3239 and 17 is 55063.' additional_kwargs={} response_metadata={'model': 'mistral:latest', 'created_at': '2025-09-15T18:48:00.799439419Z', 'done': True, 'done_reason': 'stop', 'total_duration': 727540051, 'load_duration': 4201840, 'prompt_eval_count': 58, 'prompt_eval_duration': 7496174, 'eval_count': 23, 'eval_duration': 715201745, 'model_name': 'mistral:latest'} id='run--dc4f25f0-e585-41f7-96a9-3d0c1f9d2b25-0' usage_metadata={'input_tokens': 58, 'output_tokens': 23, 'total_tokens': 81}
-    MODEL_NAME = "mistral:latest"
+    #MODEL_NAME = "mistral:latest"
 
     llm = init_chat_model(MODEL_NAME, model_provider="ollama")
 
