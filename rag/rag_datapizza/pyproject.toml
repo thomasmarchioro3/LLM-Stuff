@@ -1,0 +1,11 @@
+[project]
+name = "test-datapizza"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "datapizza-ai>=0.0.7",
+    "datapizza-ai-clients-openai-like>=0.0.8",
+    "datapizza-ai-parsers-docling>=0.0.7",
+]
