@@ -17,15 +17,14 @@ Args:
 
 import os
 import shutil
-import warnings
-warnings.filterwarnings("ignore")    
-
+from pathlib import Path
 from collections import Counter
 
 # External libraries
-from langchain.document_loaders.pdf import PyPDFDirectoryLoader
-from langchain.schema.document import Document
-from langchain.vectorstores.chroma import Chroma
+# NOTE: langchain_community is being sunset, but there is no official replacement for PyPDFLoader (to my knowledge)
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_core.documents import Document
+from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Local modules
@@ -36,17 +35,15 @@ CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 10
 
 
-def get_documents(base_path: str) -> list[Document]:
-    """
-    Load documents from a directory of PDF files.
-    TODO: Try LLamaParse https://github.com/run-llama/llama_parse
-    """
-    loader = PyPDFDirectoryLoader(
-        path=base_path,
-        recursive=False,
-    )
-    documents = loader.load()
-    return documents
+def get_documents(directory_path: str) -> list[Document]:
+    docs = []
+    # Use standard library to find files
+    path = Path(directory_path)
+    for pdf_file in path.glob("*.pdf"):
+        # Instantiate the specific loader for the individual file
+        loader = PyPDFLoader(str(pdf_file))
+        docs.extend(loader.load())
+    return docs
 
 
 def split_documents_into_chunks(
@@ -101,14 +98,13 @@ def add_chunks_to_chroma(db: Chroma, chunks: list[Document]) -> list[Document]:
     
     if len(chunks) > 0:
         db.add_documents(chunks, ids=list(map(lambda chunk: chunk.metadata["id"], chunks)))
-        db.persist()
 
     return chunks
 
 
-def clear_db(db: Chroma) -> None:
-    if os.path.exists(db.persist_directory):
-        shutil.rmtree(db.persist_directory)
+def clear_db(persist_directory: str | Path) -> None:
+    if os.path.exists(persist_directory):
+        shutil.rmtree(persist_directory)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-from langchain.vectorstores.chroma import Chroma
-from langchain.prompts import ChatPromptTemplate
-from langchain_community.llms.ollama import Ollama
+from langchain_chroma import Chroma
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import OllamaLLM
 
 # Local modules
 from utils.path import PDF_PATH, CHROMA_PATH
@@ -21,7 +21,7 @@ Answer the question based on the above context: {question}
 
 TOP_K = 3
 
-def naive_rag(model: Ollama, db: Chroma, query: str, top_k: int) -> str:
+def naive_rag(model: OllamaLLM, db: Chroma, query: str, top_k: int) -> str:
     """
     Naive RAG (retrieval + generation) implemented according to https://arxiv.org/pdf/2312.10997
     The indexing step is performed by the `database.pdf2chroma` module.
@@ -37,6 +37,10 @@ def naive_rag(model: Ollama, db: Chroma, query: str, top_k: int) -> str:
         context=context, 
         question=query
     )
+
+    print("="*32)
+    print(f"Context: {context}")
+    print("="*32)
 
     # Generation
     response_text = model.invoke(prompt)
@@ -64,12 +68,15 @@ if __name__ == "__main__":
         embedding_function=get_embeddings(),
     )
 
-    model = Ollama(
+    model = OllamaLLM(
         # endpoint="http://localhost:11434",
-        model="llama2"
+        model="llama3.2:1b"
     )
 
     while True:
-        query = input("Enter your question: ")
+        query: str = input("Enter your question (/bye to exit): ")
+        if query.strip() in ["/bye", "/exit", "/quit"]:
+            print("Bye!")
+            break
         response = naive_rag(model, db, query, args.top_k)
         print(response)

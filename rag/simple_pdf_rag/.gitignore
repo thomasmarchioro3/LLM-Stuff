@@ -1,6 +1,8 @@
 
 # Personal PDF files
 pdf/*.pdf
+!pdf/ESORICS_2025_paper_756.pdf
+!pdf/SECRYPT_2022_59_CR.pdf
 
 # Chroma DB
 chroma-db/*
@@ -9,3 +11,6 @@ chroma-db/*
 # Python cache files
 **/__pycache__/*
 *.pyc
+
+# venv
+.venv
